@@ -42,30 +42,36 @@ function post() {
       }
       const list = document.getElementById("list");
       const titleText = document.getElementById("title");
-      const picText = document.getElementById("pic");
-      const statusText = document.getElementById("status");
+      // const picText = document.getElementById("pic");
+      // const statusText = document.getElementById("status");
       const contentText = document.getElementById("content");
       list.insertAdjacentHTML("afterend", buildHTML(XHR));
       titleText.value = "";
-      picText.value = "";
-      statusText.value = "";
+      // picText.value = "";
+      // statusText.value = "";
       contentText.value = "";
-      attachDeleteEventListeners();
+      attachEventListeners();
     };
   });
-  attachDeleteEventListeners();
+  attachEventListeners();
 }
 
 function deletePost(event) {
   // 投稿の削除
   event.preventDefault();
-  const postId = this.getAttribute('data-post-id');
+  const postId = this.getAttribute("data-post-id");
   const XHR = new XMLHttpRequest();
-  XHR.open('DELETE', `/posts/${postId}`, true);
-  XHR.setRequestHeader('X-CSRF-Token', document.querySelector('meta[name="csrf-token"]').getAttribute('content'));
+  XHR.open("DELETE", `/posts/${postId}`, true);
+  XHR.setRequestHeader(
+    "X-CSRF-Token",
+    document.querySelector('meta[name="csrf-token"]').getAttribute("content")
+  );
   XHR.onload = () => {
-    if (XHR.status == 204) { // 204 No Content
-      const postItem = document.querySelector(`.post[data-post-id="${postId}"]`);
+    if (XHR.status == 204) {
+      // 204 No Content
+      const postItem = document.querySelector(
+        `.post[data-post-id="${postId}"]`
+      );
       postItem.remove();
     } else {
       alert(`Error ${XHR.status}: ${XHR.statusText}`);
@@ -73,19 +79,39 @@ function deletePost(event) {
   };
 
   XHR.onerror = () => {
-    alert('Request failed');
+    alert("Request failed");
   };
 
   XHR.send();
 }
 
+function ongoingIndex() {
+  // Ajaxリクエストの送信
+  const XHR = new XMLHttpRequest();
+  XHR.open("GET", "/posts.json", true);
+  XHR.responseType = "json";
+  XHR.send();
+
+  // レスポンスの処理
+  XHR.onload = function () {
+    if (XHR.status === 200) {
+      const posts = XHR.response;
+      const list = document.getElementById("post-list");
+      posts.forEach(function (post) {
+        const postItem = document.createElement("li");
+        postItem.textContent = post.title;
+        list.appendChild(postItem);
+      });
+    }
+  };
+}
 
 window.addEventListener("turbo:load", post);
 
-function attachDeleteEventListeners() {
-  const deleteButtons = document.querySelectorAll('.delete-button');
-  deleteButtons.forEach(button => {
-    button.removeEventListener('click', deletePost); // 既存のイベントリスナーを削除
-    button.addEventListener('click', deletePost); // 新しくイベントリスナーを追加
+function attachEventListeners() {
+  const deleteButtons = document.querySelectorAll(".delete-button");
+  deleteButtons.forEach((button) => {
+    button.removeEventListener("click", deletePost); // 既存のイベントリスナーを削除
+    button.addEventListener("click", deletePost); // 新しくイベントリスナーを追加
   });
 }

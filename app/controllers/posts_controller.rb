@@ -15,6 +15,10 @@ class PostsController < ApplicationController
     head :no_content
   end
 
+  def ongoing_index
+    @posts = Post.where(status: '進行中').order(created_at: :desc)
+  end
+
   private
   def post_params
     params.require(:post).permit(:title, :pic, :status, :content)
