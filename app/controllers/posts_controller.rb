@@ -1,13 +1,26 @@
 class PostsController < ApplicationController
-  def index
-    @posts = Post.all
-  end
+  before_action :set_post, only: [:destroy]
 
-  def new
+  def index
+    @posts = Post.all.order(created_at: :desc)
   end
 
   def create
-    Post.create(content: params[:content])
-    redirect_to "/posts"
+    post = Post.create(post_params)
+    render json:{ post: post }
+  end
+
+  def destroy
+    @post.destroy
+    head :no_content
+  end
+
+  private
+  def post_params
+    params.require(:post).permit(:title, :pic, :status, :content)
+  end
+
+  def set_post
+    @post = Post.find(params[:id])
   end
 end

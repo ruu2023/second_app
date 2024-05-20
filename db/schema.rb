@@ -12,6 +12,10 @@
 
 ActiveRecord::Schema[7.0].define(version: 2024_05_16_113833) do
   create_table "posts", charset: "utf8mb4", force: :cascade do |t|
+    t.text "posted_at"
+    t.text "title"
+    t.text "pic"
+    t.text "status"
     t.text "content"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
