@@ -54,30 +54,35 @@ function post() {
 function deletePost(event) {
   // 投稿の削除
   event.preventDefault();
-  const postId = this.getAttribute("data-post-id");
-  const XHR = new XMLHttpRequest();
-  XHR.open("DELETE", `/posts/${postId}`, true);
-  XHR.setRequestHeader(
-    "X-CSRF-Token",
-    document.querySelector('meta[name="csrf-token"]').getAttribute("content")
-  );
-  XHR.onload = () => {
-    if (XHR.status == 204) {
-      // 204 No Content
-      const postItem = document.querySelector(
-        `.post[data-post-id="${postId}"]`
-      );
-      postItem.remove();
-    } else {
-      alert(`Error ${XHR.status}: ${XHR.statusText}`);
-    }
-  };
+  if (confirm("本当に削除しますか？")) {
+    const postId = this.getAttribute("data-post-id");
+    const XHR = new XMLHttpRequest();
+    XHR.open("DELETE", `/posts/${postId}`, true);
+    XHR.setRequestHeader(
+      "X-CSRF-Token",
+      document.querySelector('meta[name="csrf-token"]').getAttribute("content")
+    );
+    XHR.onload = () => {
+      if (XHR.status == 204) {
+        // 204 No Content
+        const postItem = document.querySelector(
+          `.post[data-post-id="${postId}"]`
+        );
+        postItem.remove();
+      } else {
+        alert(`Error ${XHR.status}: ${XHR.statusText}`);
+      }
+    };
 
-  XHR.onerror = () => {
-    alert("Request failed");
-  };
+    XHR.onerror = () => {
+      alert("Request failed");
+    };
 
-  XHR.send();
+    XHR.send();
+    alert("削除しました。"); // 削除が完了したことをユーザーに通知するためのアラート
+  } else {
+    alert("削除がキャンセルされました。"); // キャンセルされたことをユーザーに通知するためのアラート
+  }
 }
 
 function ongoingIndex() {
