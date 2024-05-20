@@ -14,8 +14,12 @@
       <nav class="flex justify-between mx-auto container items-center">
         <div class="text-4xl">課題管理表</div>
         <div class="space-x-4 sm:space-x-12 font-bold">
-          <a href="" class="hover:text-green-200 transition-all duration-300">home</a>
-          <a href="" class="hover:text-green-200 transition-all duration-300">ログイン</a>
+          <a href="/" class="hover:text-green-200 transition-all duration-300">home</a>
+          <% if user_signed_in? %>
+            <%= link_to "ログアウト", destroy_user_session_path, class: "hover:text-green-200 transition-all duration-300", data: { turbo_method: :delete } %>
+          <% else %>
+            <%= link_to "ログイン", new_user_session_path, class: "hover:text-green-200 transition-all duration-300" %>
+          <% end %>
         </div>
       </nav>
     </header>
