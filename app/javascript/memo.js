@@ -1,5 +1,4 @@
-const buildHTML = (XHR) => {
-  const item = XHR.response.post;
+const buildHTML = (item) => {
   const html = `
     <div class="post" data-post-id="${item.id}">
       <div class="post-date">
@@ -40,52 +39,92 @@ function post() {
         alert(`Error ${XHR.status}: ${XHR.statusText}`);
         return null;
       }
-      const list = document.getElementById("list");
       const titleText = document.getElementById("title");
-      const picText = document.getElementById("pic");
-      const statusText = document.getElementById("status");
       const contentText = document.getElementById("content");
-      list.insertAdjacentHTML("afterend", buildHTML(XHR));
+      const list = document.getElementById("list");
+      list.insertAdjacentHTML("afterend", buildHTML(XHR.response.post));
       titleText.value = "";
-      picText.value = "";
-      statusText.value = "";
       contentText.value = "";
-      attachDeleteEventListeners();
+      attachEventListeners();
     };
   });
-  attachDeleteEventListeners();
+  attachEventListeners();
 }
 
 function deletePost(event) {
   // 投稿の削除
   event.preventDefault();
-  const postId = this.getAttribute('data-post-id');
-  const XHR = new XMLHttpRequest();
-  XHR.open('DELETE', `/posts/${postId}`, true);
-  XHR.setRequestHeader('X-CSRF-Token', document.querySelector('meta[name="csrf-token"]').getAttribute('content'));
-  XHR.onload = () => {
-    if (XHR.status == 204) { // 204 No Content
-      const postItem = document.querySelector(`.post[data-post-id="${postId}"]`);
-      postItem.remove();
-    } else {
-      alert(`Error ${XHR.status}: ${XHR.statusText}`);
-    }
-  };
+  if (confirm("本当に削除しますか？")) {
+    const postId = this.getAttribute("data-post-id");
+    const XHR = new XMLHttpRequest();
+    XHR.open("DELETE", `/posts/${postId}`, true);
+    XHR.setRequestHeader(
+      "X-CSRF-Token",
+      document.querySelector('meta[name="csrf-token"]').getAttribute("content")
+    );
+    XHR.onload = () => {
+      if (XHR.status == 204) {
+        // 204 No Content
+        const postItem = document.querySelector(
+          `.post[data-post-id="${postId}"]`
+        );
+        postItem.remove();
+      } else {
+        alert(`Error ${XHR.status}: ${XHR.statusText}`);
+      }
+    };
 
-  XHR.onerror = () => {
-    alert('Request failed');
-  };
+    XHR.onerror = () => {
+      alert("Request failed");
+    };
 
-  XHR.send();
+    XHR.send();
+    alert("削除しました。"); // 削除が完了したことをユーザーに通知するためのアラート
+  } else {
+    alert("削除がキャンセルされました。"); // キャンセルされたことをユーザーに通知するためのアラート
+  }
 }
 
+function ongoingIndex() {
+  // 継続のみ表示
+  const ongoingButton = document.getElementById("ongoing-button");
+  ongoingButton.addEventListener("click", (e) => {
+    e.preventDefault();
+    // Ajaxリクエストの送信
+    const XHR = new XMLHttpRequest();
+    XHR.open("GET", "/posts/ongoing_index.json", true);
+    XHR.responseType = "json";
+    XHR.send();
 
-window.addEventListener("turbo:load", post);
+    // レスポンスの処理
+    XHR.onload = function () {
+      if (XHR.status != 200) {
+        alert(`Error ${XHR.status}: ${XHR.statusText}`);
+        return null;
+      } else {
+        const posts = XHR.response;
+        // existing要素を一括で削除
+        const existing = document.querySelectorAll(".post");
+        existing.forEach((post) => post.remove());
+        // レスポンスからHTMLを生成
+        posts.forEach(function (post) {
+          const list = document.getElementById("list");
+          list.insertAdjacentHTML("afterend", buildHTML(post));
+        });
+      }
+    };
+  });
+}
 
-function attachDeleteEventListeners() {
-  const deleteButtons = document.querySelectorAll('.delete-button');
-  deleteButtons.forEach(button => {
-    button.removeEventListener('click', deletePost); // 既存のイベントリスナーを削除
-    button.addEventListener('click', deletePost); // 新しくイベントリスナーを追加
+window.addEventListener("turbo:load", function () {
+  post();
+  ongoingIndex();
+});
+
+function attachEventListeners() {
+  const deleteButtons = document.querySelectorAll(".delete-button");
+  deleteButtons.forEach((button) => {
+    button.removeEventListener("click", deletePost); // 既存のイベントリスナーを削除
+    button.addEventListener("click", deletePost); // 新しくイベントリスナーを追加
   });
 }
