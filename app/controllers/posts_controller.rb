@@ -16,7 +16,11 @@ class PostsController < ApplicationController
   end
 
   def ongoing_index
-    @posts = Post.where(status: '進行中').order(created_at: :desc)
+    @posts = Post.where(status: '継続').order(created_at: :desc)
+    respond_to do |format|
+      format.html
+      format.json { render json: @posts.map { |post| { id: post.id, posted_at: post.posted_at, title: post.title, pic: post.pic, status: post.status, content: post.content, created_at: post.created_at, updated_at: post.updated_at } } }
+    end
   end
 
   private

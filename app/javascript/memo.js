@@ -1,5 +1,4 @@
-const buildHTML = (XHR) => {
-  const item = XHR.response.post;
+const buildHTML = (item) => {
   const html = `
     <div class="post" data-post-id="${item.id}">
       <div class="post-date">
@@ -40,15 +39,11 @@ function post() {
         alert(`Error ${XHR.status}: ${XHR.statusText}`);
         return null;
       }
-      const list = document.getElementById("list");
       const titleText = document.getElementById("title");
-      // const picText = document.getElementById("pic");
-      // const statusText = document.getElementById("status");
       const contentText = document.getElementById("content");
-      list.insertAdjacentHTML("afterend", buildHTML(XHR));
+      const list = document.getElementById("list");
+      list.insertAdjacentHTML("afterend", buildHTML(XHR.response.post));
       titleText.value = "";
-      // picText.value = "";
-      // statusText.value = "";
       contentText.value = "";
       attachEventListeners();
     };
@@ -86,27 +81,40 @@ function deletePost(event) {
 }
 
 function ongoingIndex() {
-  // Ajaxリクエストの送信
-  const XHR = new XMLHttpRequest();
-  XHR.open("GET", "/posts.json", true);
-  XHR.responseType = "json";
-  XHR.send();
+  // 継続のみ表示
+  const ongoingButton = document.getElementById("ongoing-button");
+  ongoingButton.addEventListener("click", (e) => {
+    e.preventDefault();
+    // Ajaxリクエストの送信
+    const XHR = new XMLHttpRequest();
+    XHR.open("GET", "/posts/ongoing_index.json", true);
+    XHR.responseType = "json";
+    XHR.send();
 
-  // レスポンスの処理
-  XHR.onload = function () {
-    if (XHR.status === 200) {
-      const posts = XHR.response;
-      const list = document.getElementById("post-list");
-      posts.forEach(function (post) {
-        const postItem = document.createElement("li");
-        postItem.textContent = post.title;
-        list.appendChild(postItem);
-      });
-    }
-  };
+    // レスポンスの処理
+    XHR.onload = function () {
+      if (XHR.status != 200) {
+        alert(`Error ${XHR.status}: ${XHR.statusText}`);
+        return null;
+      } else {
+        const posts = XHR.response;
+        // existing要素を一括で削除
+        const existing = document.querySelectorAll(".post");
+        existing.forEach((post) => post.remove());
+        // レスポンスからHTMLを生成
+        posts.forEach(function (post) {
+          const list = document.getElementById("list");
+          list.insertAdjacentHTML("afterend", buildHTML(post));
+        });
+      }
+    };
+  });
 }
 
-window.addEventListener("turbo:load", post);
+window.addEventListener("turbo:load", function () {
+  post();
+  ongoingIndex();
+});
 
 function attachEventListeners() {
   const deleteButtons = document.querySelectorAll(".delete-button");
