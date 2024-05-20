@@ -1,18 +1,25 @@
 <!DOCTYPE html>
 <html>
   <head>
-    <title>SecondApp</title>
+    <title>KKApp</title>
     <meta name="viewport" content="width=device-width,initial-scale=1">
     <%= csrf_meta_tags %>
     <%= csp_meta_tag %>
     <%= stylesheet_link_tag "tailwind", "inter-font", "data-turbo-track": "reload" %>
-
     <%= stylesheet_link_tag "application", "data-turbo-track": "reload" %>
     <%= javascript_importmap_tags %>
   </head>
-
   <body>
-    <main class="container mx-auto mt-28 px-5 flex">
+    <header class="bg-cyan-800 p-4 text-white">
+      <nav class="flex justify-between mx-auto container items-center">
+        <div class="text-4xl">課題管理表</div>
+        <div class="space-x-4 sm:space-x-12 font-bold">
+          <a href="" class="hover:text-green-200 transition-all duration-300">home</a>
+          <a href="" class="hover:text-green-200 transition-all duration-300">ログイン</a>
+        </div>
+      </nav>
+    </header>
+    <main class="container mx-auto mt-5 px-5">
       <%= yield %>
     </main>
   </body>
