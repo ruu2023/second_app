@@ -7,7 +7,7 @@
     </div>
     <div class="py-4 px-3">
       <%= form.label "post[pic]", "担当者", class: "text-2xl block py-2" %>
-      <%= form.text_field "post[pic]", placeholder: current_user.nickname , id: "pic", class: "w-full" %>
+      <%= form.text_field "post[pic]", value: current_user.nickname, readonly: true, id: "pic", class: "w-full" %>
     </div>
     <div class="py-4 px-3">
       <%= form.label "post[status]", "ステータス", class: "text-2xl block py-2" %>
