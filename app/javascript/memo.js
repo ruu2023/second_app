@@ -36,6 +36,12 @@ function post() {
   const form = document.getElementById("form");
   form.addEventListener("submit", (e) => {
     e.preventDefault();
+    const titleText = document.getElementById("title");
+    const contentText = document.getElementById("content");
+    if (titleText.value.trim() === "" || contentText.value.trim() === "" ) {
+      alert("すべてご記入お願いします。");
+      return null;
+    }
     const formData = new FormData(form);
     const XHR = new XMLHttpRequest();
     XHR.open("POST", "/posts", true);
@@ -46,8 +52,6 @@ function post() {
         alert(`Error ${XHR.status}: ${XHR.statusText}`);
         return null;
       }
-      const titleText = document.getElementById("title");
-      const contentText = document.getElementById("content");
       const list = document.getElementById("list");
       list.insertAdjacentHTML("afterend", buildHTML(XHR.response.post));
       titleText.value = "";

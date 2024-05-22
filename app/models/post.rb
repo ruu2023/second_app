@@ -1,5 +1,7 @@
 class Post < ApplicationRecord
   before_create :set_posted_at
+  validates :title, :content, presence: true
+  belongs_to :user
 
   private
 
