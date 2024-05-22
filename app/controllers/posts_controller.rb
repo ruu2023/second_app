@@ -1,5 +1,6 @@
 class PostsController < ApplicationController
   before_action :set_post, only: [:destroy]
+  before_action :authenticate_user!
 
   def index
     @posts = Post.all.order(created_at: :desc)
@@ -25,7 +26,7 @@ class PostsController < ApplicationController
 
   private
   def post_params
-    params.require(:post).permit(:title, :pic, :status, :content)
+    params.require(:post).permit(:title, :pic, :status, :content).merge(user_id: current_user.id)
   end
 
   def set_post

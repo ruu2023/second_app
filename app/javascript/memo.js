@@ -1,25 +1,32 @@
 const buildHTML = (item) => {
   const html = `
-    <div class="post" data-post-id="${item.id}">
-      <div class="post-date">
-        ID：${item.id}
+    <div class="post bg-amber-100 shadow-xl rounded-md px-3 py-3 my-7" data-post-id="${item.id}">
+      <div class="flex justify-between md:text-lg">
+        <div>
+          No.${item.id}
+        </div>
+        <div>
+          記入日：${item.posted_at}
+        </div>
       </div>
-      <div class="post-date">
-        記入日：${item.posted_at}
+      <div class="text-2xl md:text-3xl">
+        「${item.title}」
       </div>
-      <div class="post-date">
-        タイトル：${item.title}
+      <div class="flex justify-between md:text-lg">
+        <div>
+          担当者：${item.pic}
+        </div>
+        <div>
+          ステータス：${item.status}
+        </div>
       </div>
-      <div class="post-content">
-        担当者：${item.pic}
+      <div class="text-lg py-1 md:text-2xl">
+        ${item.content}
       </div>
-      <div class="post-content">
-        ステータス：${item.status}
+      <div class="flex justify-end">
+        <button class="delete-button block px-3 py-2 bg-gray-300 rounded-md text-white hover:bg-red-700 cursor-pointer transition-all duration-300" data-post-id="${item.id}">削除</button>
       </div>
-      <div class="post-content">
-        詳細：${item.content}
-      </div>
-      <button class="delete-button" data-post-id="${item.id}">削除</button>
+      
     </div>`;
   return html;
 };
@@ -29,6 +36,12 @@ function post() {
   const form = document.getElementById("form");
   form.addEventListener("submit", (e) => {
     e.preventDefault();
+    const titleText = document.getElementById("title");
+    const contentText = document.getElementById("content");
+    if (titleText.value.trim() === "" || contentText.value.trim() === "" ) {
+      alert("すべてご記入お願いします。");
+      return null;
+    }
     const formData = new FormData(form);
     const XHR = new XMLHttpRequest();
     XHR.open("POST", "/posts", true);
@@ -39,8 +52,6 @@ function post() {
         alert(`Error ${XHR.status}: ${XHR.statusText}`);
         return null;
       }
-      const titleText = document.getElementById("title");
-      const contentText = document.getElementById("content");
       const list = document.getElementById("list");
       list.insertAdjacentHTML("afterend", buildHTML(XHR.response.post));
       titleText.value = "";
