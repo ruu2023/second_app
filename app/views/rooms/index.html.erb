@@ -1,0 +1,9 @@
+<%= form_with url: '', method: :get, id: 'room-select-form', class: 'px-3', local: true do %>
+  <div class="text-2xl block py-2">プロジェクト</div>
+  <select id="room-select">
+    <option value="">プロジェクトを選択</option>
+    <% @rooms.each do |room| %>
+      <option value="<%= room.id %>"><%= room.name %></option>
+    <% end %>
+  </select>
+<% end %>

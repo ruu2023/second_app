@@ -1,0 +1,35 @@
+<div class='chat-room-form'>
+  <h1>新規プロジェクト</h1>
+  <%=form_with model: @room, local: true do |f|%>
+    <div class='chat-room-form__field'>
+      <div class='chat-room-form__field--left'>
+        <%= f.label :name, :プロジェクト名, class: 'chat-room-form__label'%>
+      </div>
+      <div class='chat-room-form__field--right'>
+        <%= f.text_field :name, class: 'chat__room_name chat-room-form__input', placeholder: 'プロジェクト名を入力してください'%>
+      </div>
+    </div>
+    <div class='chat-room-form__field'>
+    </div>
+    <div class='chat-room-form__field'>
+      <div class='chat-room-form__field--left'>
+        <label class='chat-room-form__label' for='chat_room_チャットメンバー'>プロジェクトメンバー</label>
+      </div>
+      <div class='chat-room-form__field--right'>
+        <select name="room[user_ids][]">
+          <option>参加ユーザーを選択してください</option>
+          <% User.where.not(id: current_user.id).each do |user| %>
+            <option value=<%= user.id %>><%= user.nickname %></option>
+          <% end %>
+        </select>
+        <input name="room[user_ids][]" type="hidden" value=<%= current_user.id %>>
+      </div>
+    </div>
+    <div class='chat-room-form__field'>
+      <div class='chat-room-form__field--left'></div>
+      <div class='chat-room-form__field--right'>
+        <%= f.submit "作成する", class: 'chat-room-form__action-btn block mx-3 px-3 py-2 bg-gray-300 rounded-md text-white hover:bg-blue-700 cursor-pointer transition-all duration-300'%>
+      </div>
+    </div>
+  <% end %>
+</div>

@@ -3,11 +3,25 @@ class PostsController < ApplicationController
   before_action :authenticate_user!
 
   def index
-    @posts = Post.all.order(created_at: :desc)
+    # @posts = Post.where(params[:room_id]).order(created_at: :desc)
+    @rooms = Room.all
+    @post = Post.new
+    @room = Room.find(params[:room_id])
+    @posts = @room.posts.includes(:user)
   end
-
+  
   def create
-    post = Post.create(post_params)
+    @posts = Post.all.order(created_at: :desc)
+    @rooms = Room.all
+    @room = Room.find(params[:room_id])
+    # @post = @room.posts.build(post_params)
+    post = @room.posts.create(post_params)
+    # if @post.save
+    #   redirect_to room_posts_path(@room)
+    # else
+    #   render :index, status: :unprocessable_entity
+    # end
+    # post = Post.create(post_params)
     render json:{ post: post }
   end
 

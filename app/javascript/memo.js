@@ -31,9 +31,20 @@ const buildHTML = (item) => {
   return html;
 };
 
+function selectRoom() {
+  const select = document.getElementById('room-select');
+  select.addEventListener('change', (e) => {
+    const roomId = e.target.value;
+    if (roomId) {
+      window.location.href = `/rooms/${roomId}/posts`;
+    }
+  });
+};
+
 function post() {
   // 投稿の作成
   const form = document.getElementById("form");
+  const roomId = form.dataset.roomId;
   form.addEventListener("submit", (e) => {
     e.preventDefault();
     const titleText = document.getElementById("title");
@@ -44,7 +55,7 @@ function post() {
     }
     const formData = new FormData(form);
     const XHR = new XMLHttpRequest();
-    XHR.open("POST", "/posts", true);
+    XHR.open("POST", `/rooms/${roomId}/posts`, true);
     XHR.responseType = "json";
     XHR.send(formData);
     XHR.onload = () => {
@@ -67,8 +78,9 @@ function deletePost(event) {
   event.preventDefault();
   if (confirm("本当に削除しますか？")) {
     const postId = this.getAttribute("data-post-id");
+    const roomId = this.getAttribute("data-room-id");
     const XHR = new XMLHttpRequest();
-    XHR.open("DELETE", `/posts/${postId}`, true);
+    XHR.open("DELETE", `/rooms/${roomId}/posts/${postId}`, true);
     XHR.setRequestHeader(
       "X-CSRF-Token",
       document.querySelector('meta[name="csrf-token"]').getAttribute("content")
@@ -99,11 +111,12 @@ function deletePost(event) {
 function ongoingIndex() {
   // 継続のみ表示
   const ongoingButton = document.getElementById("ongoing-button");
+  const roomId = ongoingButton.getAttribute("data-room-id");
   ongoingButton.addEventListener("click", (e) => {
     e.preventDefault();
     // Ajaxリクエストの送信
     const XHR = new XMLHttpRequest();
-    XHR.open("GET", "/posts/ongoing_index.json", true);
+    XHR.open("GET", `/rooms/${roomId}/posts/ongoing_index.json`, true);
     XHR.responseType = "json";
     XHR.send();
 
@@ -127,9 +140,45 @@ function ongoingIndex() {
   });
 }
 
+function deleteRoom() {
+  const deleteButton = document.getElementById("delete-room");
+  // ルームの削除
+  deleteButton.addEventListener('click', (e) => {
+    e.preventDefault();
+    if (confirm("現在のプロジェクトが削除されます。本当に削除しますか？")) {
+      const roomId = deleteButton.getAttribute("data-room-id");
+      const XHR = new XMLHttpRequest();
+      XHR.open("DELETE", `/rooms/${roomId}`, true);
+      XHR.setRequestHeader(
+        "X-CSRF-Token",
+        document.querySelector('meta[name="csrf-token"]').getAttribute("content")
+      );
+      XHR.onload = () => {
+        if (XHR.status == 204) {
+          // 204 No Content
+          window.location.href = `/rooms`;
+        } else {
+          alert(`Error ${XHR.status}: ${XHR.statusText}`);
+        }
+      };
+  
+      XHR.onerror = () => {
+        alert("Request failed");
+      };
+  
+      XHR.send();
+      alert("削除しました。"); // 削除が完了したことをユーザーに通知するためのアラート
+    } else {
+      alert("削除がキャンセルされました。"); // キャンセルされたことをユーザーに通知するためのアラート
+    }
+  })
+}
+
 window.addEventListener("turbo:load", function () {
+  selectRoom();
   post();
   ongoingIndex();
+  deleteRoom();
 });
 
 function attachEventListeners() {

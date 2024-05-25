@@ -1,21 +1,37 @@
-<!-- /.deleteModal -->
-<%= form_with url: "/posts", method: :post, id: "form", remote: true do |form| %>
+<%= form_with url: '', method: :get, id: 'room-select-form', class: 'px-3', local: true do %>
+  <div class="text-2xl block py-2">プロジェクト</div>
+  <div class="lg:flex items-center">
+    <select id="room-select">
+      <option value=""><%= @room.name %></option>
+      <% current_user.rooms.each do |room| %>
+        <% next if room == @room %> <!-- 現在の @room をスキップ -->
+        <option value="<%= room.id %>"><%= room.name %></option>
+      <% end %>
+    </select>
+    <div class="flex px-3">
+      <%= link_to "プロジェクト追加", new_room_path, class: "block mx-3 px-3 py-2 bg-gray-300 rounded-md text-white hover:bg-blue-700 cursor-pointer transition-all duration-300" %>
+      <button id="delete-room" class="block px-3 py-2 bg-gray-300 rounded-md text-white hover:bg-red-700 cursor-pointer transition-all duration-300" data-room-id="<%= @room.id %>">プロジェクト削除</button>
+    </div>
+  </div>
+  <!-- /.lg:flex -->
+<% end %>
+<%= form_with model: [@room, @post], data: { room_id: @room.id }, method: :post, id: "form", remote: true do |form| %>
   <div class="lg:flex justify-left flex-wrap">
     <div class="py-4 basis-1/3 px-3">
-      <%= form.label "post[title]", "タイトル", class: "text-2xl block py-2" %>
-      <%= form.text_field "post[title]", id: "title", class: "w-full" %>
+      <%= form.label "title", "タイトル", class: "text-2xl block py-2" %>
+      <%= form.text_field "title", id: "title", class: "w-full" %>
     </div>
     <div class="py-4 px-3">
-      <%= form.label "post[pic]", "担当者", class: "text-2xl block py-2" %>
-      <%= form.text_field "post[pic]", value: current_user.nickname, readonly: true, id: "pic", class: "w-full" %>
+      <%= form.label "pic", "担当者", class: "text-2xl block py-2" %>
+      <%= form.text_field "pic", value: current_user.nickname, readonly: true, id: "pic", class: "w-full" %>
     </div>
     <div class="py-4 px-3">
-      <%= form.label "post[status]", "ステータス", class: "text-2xl block py-2" %>
-      <%= form.select "post[status]", [["継続", "継続"], ["解決", "解決"], ["記録のみ", "記録のみ"]], selected: "記録のみ", id: "status", class: "w-full" %>
+      <%= form.label "status", "ステータス", class: "text-2xl block py-2" %>
+      <%= form.select "status", [["継続", "継続"], ["解決", "解決"], ["記録のみ", "記録のみ"]], selected: "記録のみ", id: "status", class: "w-full" %>
     </div>
     <div class="py-4 basis-full px-3">
-      <%= form.label "post[content]", "詳細", class: "text-2xl block py-2" %>
-      <%= form.text_area "post[content]", rows: 7, id: "content", class: "w-full" %>
+      <%= form.label "content", "詳細", class: "text-2xl block py-2" %>
+      <%= form.text_area "content", rows: 7, id: "content", class: "w-full" %>
     </div>
   </div>
   <div class="flex justify-end px-3 pb-4">
@@ -23,7 +39,7 @@
   </div>
 <% end %>
 <hr>
-<button id="ongoing-button" class="block px-6 py-3 my-4 bg-blue-300 rounded-md text-white hover:bg-blue-700 cursor-pointer transition-all duration-300">継続を表示</button>
+<button id="ongoing-button" class="block px-6 py-3 my-4 bg-blue-300 rounded-md text-white hover:bg-blue-700 cursor-pointer transition-all duration-300" data-room-id="<%= @room.id %>">継続を表示</button>
 <div id="list">
 </div>
 <% @posts.each do |post| %>
@@ -51,7 +67,7 @@
       <%= post.content %>
     </div>
     <div class="flex justify-end">
-      <button class="delete-button block px-3 py-2 bg-gray-300 rounded-md text-white hover:bg-red-700 cursor-pointer transition-all duration-300" data-post-id="<%= post.id %>">削除</button>
+      <button class="delete-button block px-3 py-2 bg-gray-300 rounded-md text-white hover:bg-red-700 cursor-pointer transition-all duration-300" data-room-id="<%= @room.id %>" data-post-id="<%= post.id %>">削除</button>
     </div>
   </div>
 <% end %>
