@@ -1,19 +1,18 @@
 class PostsController < ApplicationController
-  before_action :set_post, only: [:destroy]
+  before_action :set_room
+  before_action :set_post, only: [:update, :destroy]
   before_action :authenticate_user!
 
   def index
     # @posts = Post.where(params[:room_id]).order(created_at: :desc)
     @rooms = Room.all
     @post = Post.new
-    @room = Room.find(params[:room_id])
-    @posts = @room.posts.includes(:user)
+    @posts = @room.posts.includes(:user).order(created_at: :desc)
   end
   
   def create
     @posts = Post.all.order(created_at: :desc)
     @rooms = Room.all
-    @room = Room.find(params[:room_id])
     # @post = @room.posts.build(post_params)
     post = @room.posts.create(post_params)
     # if @post.save
@@ -23,6 +22,11 @@ class PostsController < ApplicationController
     # end
     # post = Post.create(post_params)
     render json:{ post: post }
+  end
+  
+  def update
+    @post.update(post_params)
+    render json:{ post: @post }
   end
 
   def destroy
@@ -41,6 +45,10 @@ class PostsController < ApplicationController
   private
   def post_params
     params.require(:post).permit(:title, :pic, :status, :content).merge(user_id: current_user.id)
+  end
+
+  def set_room
+    @room = Room.find(params[:room_id])
   end
 
   def set_post

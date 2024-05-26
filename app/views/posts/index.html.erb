@@ -1,16 +1,17 @@
 <%= form_with url: '', method: :get, id: 'room-select-form', class: 'px-3', local: true do %>
   <div class="text-2xl block py-2">プロジェクト</div>
   <div class="lg:flex items-center">
-    <select id="room-select">
+    <select id="room-select"  class="w-full lg:w-7/12">
+      <optgroup label=""></optgroup>
       <option value=""><%= @room.name %></option>
-      <% current_user.rooms.each do |room| %>
+      <% @rooms.each do |room| %>
         <% next if room == @room %> <!-- 現在の @room をスキップ -->
         <option value="<%= room.id %>"><%= room.name %></option>
       <% end %>
     </select>
-    <div class="flex px-3">
-      <%= link_to "プロジェクト追加", new_room_path, class: "block mx-3 px-3 py-2 bg-gray-300 rounded-md text-white hover:bg-blue-700 cursor-pointer transition-all duration-300" %>
-      <button id="delete-room" class="block px-3 py-2 bg-gray-300 rounded-md text-white hover:bg-red-700 cursor-pointer transition-all duration-300" data-room-id="<%= @room.id %>">プロジェクト削除</button>
+    <div class="flex lg:px-3">
+      <%= link_to "プロジェクト追加", new_room_path, class: "text-sm lg:text-base block my-2 px-3 py-2 bg-gray-300 rounded-md text-white hover:bg-blue-700 cursor-pointer transition-all duration-300" %>
+      <button id="delete-room" class="text-sm lg:text-base block mx-3 my-2 px-3 py-2 bg-gray-300 rounded-md text-white hover:bg-red-700 cursor-pointer transition-all duration-300" data-room-id="<%= @room.id %>">プロジェクト削除</button>
     </div>
   </div>
   <!-- /.lg:flex -->
@@ -43,31 +44,60 @@
 <div id="list">
 </div>
 <% @posts.each do |post| %>
-  <div class="post bg-amber-100 shadow-xl rounded-md px-3 py-3 my-7" data-post-id="<%= post.id %>">
+  <div class="post bg-amber-100 shadow-xl rounded-md px-3 py-3 my-7" id="post-<%= post.id %>" data-post-id="<%= post.id %>">
     <div class="flex justify-between md:text-lg">
       <div>
-        No.<%= post.id %>
+        No. <span class="post-id"><%= post.id %></span><!-- /.post-id -->
       </div>
       <div>
-        記入日：<%= post.posted_at %>
+        記入日：<span class="posted-at"><%= post.posted_at %></span><!-- /.posted-at -->
       </div>
     </div>
     <div class="text-2xl md:text-3xl">
-      「<%= post.title %>」
+      「<span class="post-title"><%= post.title %></span><!-- /.post-title -->」
     </div>
     <div class="flex justify-between md:text-lg">
       <div>
-        担当者：<%= post.pic %>
+        担当者：<span class="post-pic"><%= post.pic %></span><!-- /.post-pic -->
       </div>
       <div>
-        ステータス：<%= post.status %>
+        ステータス：<span class="post-status"><%= post.status %></span><!-- /.post-status -->
       </div>
     </div>
     <div class="text-lg py-1 md:text-2xl">
-      <%= post.content %>
+      <span class="post-content"><%= post.content %></span><!-- /.post-content -->
     </div>
     <div class="flex justify-end">
+      <button class="edit-button block mx-3 px-3 py-2 bg-gray-300 rounded-md text-white hover:bg-green-700 cursor-pointer transition-all duration-300" data-room-id="<%= @room.id %>" data-post-id="<%= post.id %>">編集</button>
       <button class="delete-button block px-3 py-2 bg-gray-300 rounded-md text-white hover:bg-red-700 cursor-pointer transition-all duration-300" data-room-id="<%= @room.id %>" data-post-id="<%= post.id %>">削除</button>
     </div>
   </div>
 <% end %>
+<div class="modal-window-shadow">
+  <div class="modal-window-edit container w-full bg-amber-100 shadow-xl rounded-md px-3 py-3 my-7">
+    <%= form_with model: [@room, @post], data: { room_id: @room.id }, method: :patch, id: "edit-form", remote: true do |form| %>
+      <div class="lg:flex justify-left flex-wrap">
+        <div class="py-4 basis-1/3 px-3">
+          <%= form.label "title", "タイトル", class: "text-2xl block py-2" %>
+          <%= form.text_field "title", value: "rtwe", id: "edit-title", class: "w-full" %>
+        </div>
+        <div class="py-4 px-3">
+          <%= form.label "pic", "担当者", class: "text-2xl block py-2" %>
+          <%= form.text_field "pic", value: current_user.nickname, readonly: true, id: "edit-pic", class: "w-full" %>
+        </div>
+        <div class="py-4 px-3">
+          <%= form.label "status", "ステータス", class: "text-2xl block py-2" %>
+          <%= select_tag "post[status]", options_for_select([["継続", "継続"], ["解決", "解決"], ["記録のみ", "記録のみ"]]), id: "edit-status", class: "w-full" %>
+        </div>
+        <div class="py-4 basis-full px-3">
+          <%= form.label "content", "詳細", class: "text-2xl block py-2" %>
+          <%= form.text_area "content", value: "aaaa", rows: 7, id: "edit-content", class: "w-full" %>
+        </div>
+      </div>
+      <div class="flex justify-end px-3 pb-4">
+        <%= form.submit '保存する', id: "edit-submit", class:"block mx-3 px-3 py-3 bg-blue-300 rounded-md text-white hover:bg-blue-700 cursor-pointer transition-all duration-300" %>
+        <button id="close-modal" class="block px-3 py-3 bg-blue-300 rounded-md text-white hover:bg-blue-700 cursor-pointer transition-all duration-300">閉じる</button>
+      </div>
+    <% end %>
+  </div><!-- /.modal-window-edit -->
+</div><!-- /.modal-window-shadow -->

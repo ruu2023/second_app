@@ -1,9 +1,13 @@
 <%= form_with url: '', method: :get, id: 'room-select-form', class: 'px-3', local: true do %>
   <div class="text-2xl block py-2">プロジェクト</div>
-  <select id="room-select">
+  <select id="room-select" class="w-full">
+    <optgroup label=""></optgroup>
     <option value="">プロジェクトを選択</option>
     <% @rooms.each do |room| %>
       <option value="<%= room.id %>"><%= room.name %></option>
     <% end %>
   </select>
 <% end %>
+<div class="flex py-3">
+  <%= link_to "プロジェクト追加", new_room_path, class: "block mx-3 px-3 py-2 bg-gray-300 rounded-md text-white hover:bg-blue-700 cursor-pointer transition-all duration-300" %>
+</div>
