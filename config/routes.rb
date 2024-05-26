@@ -1,9 +1,11 @@
 Rails.application.routes.draw do
   devise_for :users
-  resources :posts do
-    collection do
-      get 'ongoing_index'
+  root to: "rooms#index"
+  resources :rooms do
+    resources :posts do
+      collection do
+        get 'ongoing_index'
+      end
     end
   end
-  root 'posts#index'
 end
