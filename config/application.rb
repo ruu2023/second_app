@@ -8,7 +8,6 @@ Bundler.require(*Rails.groups)
 
 require './lib/CloudflareProxy'
 
-config.middleware.use CloudflareProxy
 
 
 module SecondApp
@@ -17,7 +16,8 @@ module SecondApp
     config.load_defaults 7.0
     config.i18n.default_locale = :ja
     config.time_zone = 'Tokyo'
-
+    
+    config.middleware.use CloudflareProxy
     # Configuration for the application, engines, and railties goes here.
     #
     # These settings can be overridden in specific environments using the files
